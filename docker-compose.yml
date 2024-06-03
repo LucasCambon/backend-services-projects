@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  users:
+    build: ./users
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./users:/app
+      - /app/node_modules
+
+  tasks:
+    build: ./tasks
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./tasks:/app
+      - /app/node_modules
+
+  recipes:
+    build: ./recipes
+    ports:
+      - "4002:4002"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./recipes:/app
+      - /app/node_modules
+  
+  gateway:
+    build: ./gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - USER_SERVICE_HOST=http://users
+      - USER_SERVICE_PORT=4000
+      - TASK_SERVICE_HOST=http://tasks
+      - TASK_SERVICE_PORT=4001
+      - RECIPE_SERVICE_HOST=http://recipes
+      - RECIPE_SERVICE_PORT=4002
+      - API_GATEWAY_PORT=3000
+    depends_on:
+      - users
+      - tasks
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
